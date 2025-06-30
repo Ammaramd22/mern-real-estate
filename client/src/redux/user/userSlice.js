@@ -8,7 +8,7 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-    name: "user",
+    name: 'user',
     initialState,
     reducers:{
         signinStart: (state) => {
@@ -17,7 +17,7 @@ const userSlice = createSlice({
         },
         signinSuccess: (state, action) => {
             state.loading = false;
-            state.currentuser = action.payload;
+            state.currentUser = action.payload;
             state.error = null;
         },
         signinFailure: (state, action) => {
