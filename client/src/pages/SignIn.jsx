@@ -34,12 +34,14 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+      //console.log("API response:", data);
       if (data.success === false) {
         dispatch(signinFailure(data.message));
 
         return;
       }
-      dispatch(signinSuccess(data.user));
+      //console.log("Dispaching success with:",data.user);
+      dispatch(signinSuccess(data));
       navigate("/");
     } catch (error) {
       dispatch(signinFailure(error.message));
