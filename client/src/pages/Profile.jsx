@@ -74,17 +74,17 @@ export default function Profile() {
           className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-2"
         />
         <p className="self-center text-sm">
-          {fileUploadError ? 
-          (
-            <span className="text-red-700">Error Image Upload (image must be less then 2mb)</span>
-          ): filePerc > 0 && filePerc < 100 ? (
-            <span className="text-slate-700">Uploading  {filePerc}%</span>
+          {fileUploadError ? (
+            <span className="text-red-700">
+              Error Image Upload (image must be less then 2mb)
+            </span>
+          ) : filePerc > 0 && filePerc < 100 ? (
+            <span className="text-slate-700">Uploading {filePerc}%</span>
           ) : filePerc === 100 ? (
             <span className="text-green-700">Image Uploaded Successfully</span>
-          ) :(
-            ''
-          )
-          }
+          ) : (
+            ""
+          )}
         </p>
         <input
           type="text"
