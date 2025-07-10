@@ -33,7 +33,8 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
-
+  const [showListingsError, setShowlistingsError] = useState(false);
+  const [userListings, setUserListings] = useState([]);
   const dispatch = useDispatch();
 
   //console.log(formData)
@@ -84,9 +85,9 @@ export default function Profile() {
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -95,7 +96,6 @@ export default function Profile() {
       if (data.success === false) {
         dispatch(updateUserFailure(error.message));
         return;
-        
       }
 
       dispatch(updateUserSuccess(data));
@@ -105,32 +105,31 @@ export default function Profile() {
     }
   };
 
-  const handleDeleteUser = async (e) =>{
+  const handleDeleteUser = async (e) => {
     try {
       dispatch(deleteUserStart());
-      const res = await fetch(`/api/user/delete/${currentUser._id}`,{
-        method: 'DELETE',
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
       });
 
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
-        return
+        return;
       }
-      
+
       dispatch(deleteUserSuccess(data));
     } catch (error) {
-      dispatch(deleteUserFailure(error.message))
+      dispatch(deleteUserFailure(error.message));
     }
-  }
+  };
 
-
-  const handleSignOut = async() => {
+  const handleSignOut = async () => {
     try {
       dispatch(signOutUserStart());
-      const res = await fetch('/api/auth/signout');
+      const res = await fetch("/api/auth/signout");
       const data = await res.json();
-      if(data.success === false){
+      if (data.success === false) {
         dispatch(deleteUserFailure(data.message));
         return;
       }
@@ -138,6 +137,22 @@ export default function Profile() {
       dispatch(deleteUserSuccess(data));
     } catch (error) {
       dispatch(deleteUserFailure(data.message));
+    }
+  };
+
+  const handleShowListings = async () => {
+    try {
+      setShowlistingsError(false);
+      const res = await fetch(`/api/user/listings/${currentUser._id}`);
+      const data = await res.json();
+      if (data.success === false) {
+        setShowlistingsError(true);
+        return;
+      }
+
+      setUserListings(data);
+    } catch (error) {
+      setShowlistingsError(true);
     }
   };
 
@@ -194,20 +209,68 @@ export default function Profile() {
           id="password"
           onChange={handleChange}
         />
-        <button disabled={loading} className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95">
-          {loading ? 'Loading....': 'Update' }
+        <button
+          disabled={loading}
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95"
+        >
+          {loading ? "Loading...." : "Update"}
         </button>
-        <Link className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95" to={"/create-listing"} >
-        Create Listing
-        
+        <Link
+          className="bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95"
+          to={"/create-listing"}
+        >
+          Create Listing
         </Link>
       </form>
       <div className="flex justify-between mt-5">
-        <span onClick={handleDeleteUser} className="text-red-700 cursor-pointer">Delete Account</span>
-        <span onClick={handleSignOut} className="text-red-700 cursor-pointer">Sign Out</span>
+        <span
+          onClick={handleDeleteUser}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
+        <span onClick={handleSignOut} className="text-red-700 cursor-pointer">
+          Sign Out
+        </span>
       </div>
-      
-      <p className="text-green-700 mt-5" >{updateSuccess ? 'Success' : ''}</p>
+
+      <p className="text-green-700 mt-5">{updateSuccess ? "Success" : ""}</p>
+      <button onClick={handleShowListings} className="text-green-700 w-full">
+        Show Listings
+      </button>
+      <p className="text-red-700 mt-5">
+        {showListingsError ? "Error in show listings" : ""}
+      </p>
+
+      {userListings && userListings.length > 0 && (
+        <div className="flex flex-col gap-4 mt-5">
+          <h1 className="text-center my-7 text-2xl font-semibold" >Your Listings</h1>
+          {userListings.map((listing) => (
+            <div
+              key={listing._id}
+              className="border p-4 rounded-lg my-2 flex justify-between items-center gap-4"
+            >
+              <Link to={`/listing/${listing._id}`} className="text-blue-700">
+                <img
+                  src={listing.imageUrls[0]}
+                  alt="listing cover "
+                  className="h-16 w-16 object-contain"
+                />
+              </Link>
+              <Link
+                className=" text-slate-700 font-semibold  hover:underline truncate flex-1"
+                to={`/listing/${listing._id}`}
+              >
+                <p>{listing.name}</p>
+              </Link>
+              <div className="flex flex-col items-center ">
+                <button className="text-red-700 uppercase">Delete</button>
+                <button className="text-green-700 uppercase">Edit</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
